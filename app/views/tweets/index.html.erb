@@ -1,0 +1,56 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-2">
+      <h2>Tweets</h2>
+      <% if current_user %>
+          <h2 class="text-primary">
+            <%= flash[:alert] = "Bienvenido" %>
+          </h2>
+        <%= link_to 'Create a New Tweet', new_tweet_path, class: "btn btn-info btn-sm" %>
+      <% end %>
+    </div>
+  </div>
+  <form class="form-inline">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search"
+    aria-label="Search" name="content">
+    <button class="btn btn-outline-success my-2 my-sm-0"
+    type="submit">Search</button>
+  </form>
+</div>
+
+<br>
+
+<div class="row">
+  <% @tweets.reverse.each do |tweet| %>
+    <div class="col-sm-6 col-md-4">
+      <div class="thumbnail">
+        <%= image_tag(tweet.user.profile_photo, width: "40%") %> says:
+        <div class="caption">
+          <% if tweet.origin_tweet.nil? %>
+            <h3><%= tweet.content %></h3>
+          <% else %>
+            <%= image_tag(tweet.original_tweet.user.profile_photo, width: "20%") %> <%= tweet.original_tweet.user.user_name %> dice:
+            <div class="container mx-auto">
+              <%= tweet.content %>
+            </div>
+          <% end %>
+          <small><%= time_ago_in_words(tweet.created_at) %> ago</small>
+            <p><%= link_to 'Show', tweet, class: "btn btn-primary" %>
+              <% if current_user&.id == tweet.user_id %>
+                <%= link_to 'Edit', edit_tweet_path(tweet), class: "btn btn-warning" %> 
+                <%= link_to 'Destroy', tweet, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger" %></p>
+              <% end %>
+            <br>
+            <%= link_to 'Like', tweet_like_path(tweet), method: :post %> <%= tweet.likes.count %>
+            <br>
+            <%= link_to 'Retweet', tweet_retweet_path(tweet), method: :post %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<br>
+  <%= will_paginate @paginated_tweets, :previous_label => '', :next_label => 'Mostrar más tweets' %>
+<br>
+
